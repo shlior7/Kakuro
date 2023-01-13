@@ -1,9 +1,9 @@
 #include "board.h"
 enum type
 {
-	null_cell_type = -1,
-	o_cell_type = 0,
-	k_cell_type = 1
+	null_cell_type = -1,//null Cell
+	o_cell_type = 0,// Options Cell
+	k_cell_type = 1// Kakuro Cell Down/Right
 };
 void board::get_board(istream& in){
 	string cur1,cur2;
@@ -49,7 +49,7 @@ void board::push_current(int cur1,int cur2,int i,int j){
 		array.push_back(make_shared<o_cell>(i, j));
 		break;
 	case k_cell_type:
-		shared_ptr<k_cell> k = make_shared<k_cell>(i, j, cur1, cur2);
+		ptk_cell k = make_shared<k_cell>(i, j, cur1, cur2);
 		k_list.push_back(k);
 		array.push_back(k);
 		break;
@@ -63,8 +63,12 @@ void board::connectD(ptk_cell& kcell,int x, int y){
 		pto_cell o = dynamic_pointer_cast<o_cell>(array[index(x,k++)]);
 		o->k_down = kcell;
 		kcell->d_list->push_back(o);
+		if(o->possibilities.empty())
+			o->possibilities = kcell->d_list->possible;
 	}
-	kcell->d_list->setminmax();
+	kcell->d_list->set_min_max();
+	kcell->d_list->update_list(0, true,true);
+	//kcell->d_list->Calculate();
 }
 
 void board::connectR(ptk_cell& kcell, int x, int y) {
@@ -74,8 +78,12 @@ void board::connectR(ptk_cell& kcell, int x, int y) {
 		pto_cell o = dynamic_pointer_cast<o_cell>(array[index(k++, y)]);
 		o->k_right = kcell;
 		kcell->r_list->push_back(o);
+		if (o->possibilities.empty())
+			o->possibilities = kcell->r_list->possible;
 	}
-	kcell->r_list->setminmax();
+	kcell->r_list->set_min_max();
+	kcell->r_list->update_list(0,  true,false);
+	//kcell->r_list->Calculate();
 }
 
 void board::connectLists() {
@@ -97,9 +105,4 @@ void board::print(){
 		cout << "|\n";
 	}
 	cout << endl;
-	/*for(auto& i:k_list.c_list)
-	{
-		cout << "k: "<<endl;
-		i->printList();
-	}*/
 }

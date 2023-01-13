@@ -3,11 +3,11 @@
 class Game
 {
 public:
-	//const int SUM[] = { 0,1,3,6,10,15,21,28,36,45 };
 	unique_ptr<board> game_board;
-	Game(int width,int height):game_board(make_unique<board>(width, height)) {}
+	Game(int width, int height) :game_board(make_unique<board>(width, height)) {}
 	bool solver();
-	bool solve_down(shared_ptr<k_cell>& k);
-	bool solve_right();
-	bool possible(const shared_ptr<k_cell>& k_down,const shared_ptr<k_cell>& k_right, int n);
+	bool solve_down(ptk_cell& k);
+	bool solve_right(ptk_cell& k);
+	bool possible(const ptk_cell& k_down, const ptk_cell& k_right, int n);
+	void calculate_options(set<int> curent, int n, int k);
 };
