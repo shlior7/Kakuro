@@ -1,6 +1,6 @@
 #include "Ocell.h"
 
-void ok_list::set_min_max(bool overwrite) {
+void Block::set_min_max(bool overwrite) {
 	int len = empty_cells;
 	int sum = remain();
 	int sum_max = 0, sum_min = 0;
@@ -20,7 +20,7 @@ void ok_list::set_min_max(bool overwrite) {
 	if (max > 9) max = 9;
 	//empty_cells = len;
 }
-void ok_list::update_list(int n, bool add_or_sub, bool d_or_r) {
+void Block::update_list(int n, bool add_or_sub, bool d_or_r) {
 
 	for (auto& o : o_list.c_list)
 	{
@@ -58,12 +58,12 @@ void ok_list::update_list(int n, bool add_or_sub, bool d_or_r) {
 		}
 	}
 }
-bool ok_list::contain(set<int> poss,int n){
+bool Block::contain(set<int> poss,int n){
 	if (poss.find(n) == poss.end())
 		return false;
 	return true;
 }
-void ok_list::empty_list(){
+void Block::empty_list(){
 	for (auto& o : o_list.c_list)
 	{
 		if (o->val) {
@@ -73,12 +73,12 @@ void ok_list::empty_list(){
 	}	
 }
 
-void ok_list::push_back(pto_cell& c) {
+void Block::push_back(pto_cell& c) {
 	o_list.push_back(c);
 	empty_cells++;
 }
 
-void ok_list::add_to_sum(int n,bool d_or_r){
+void Block::add_to_sum(int n,bool d_or_r){
 	physical_sum += n;
 	empty_cells--;
 	possible.erase(n);
@@ -86,18 +86,18 @@ void ok_list::add_to_sum(int n,bool d_or_r){
 	update_list(n, true, d_or_r);
 }
 
-void ok_list::sub_from_sum(int n,bool d_or_r) {
+void Block::sub_from_sum(int n,bool d_or_r) {
 	physical_sum -= n;
 	empty_cells++;
 	possible.insert(n);
 	set_min_max();
 	update_list(n, false, d_or_r);
 }
-void ok_list::Calculate(){
+void Block::Calculate(){
 	list<int> poss;
 	Calculate_Possibility(poss, logical_sum, empty_cells);
 }
-bool ok_list::Calculate_Possibility(list<int> poss,int sum,int num_cells){
+bool Block::Calculate_Possibility(list<int> poss,int sum,int num_cells){
 	if(!num_cells)
 	{
 		if(!sum)
@@ -117,7 +117,7 @@ bool ok_list::Calculate_Possibility(list<int> poss,int sum,int num_cells){
 		}
 	}
 }
-int ok_list::calculate_possibilities1(list<int> poss,const list<int>::iterator cur, int carry) {
+int Block::calculate_possibilities1(list<int> poss,const list<int>::iterator cur, int carry) {
 	int carr = 0;
 	for(auto i= cur;i!=poss.end();++i)
 	{
@@ -144,7 +144,7 @@ int ok_list::calculate_possibilities1(list<int> poss,const list<int>::iterator c
 	}
 	return carr;
 }
-int ok_list::calculate_possibilities2(list<int> poss, const list<int>::iterator cur, int carry) {
+int Block::calculate_possibilities2(list<int> poss, const list<int>::iterator cur, int carry) {
 	int carr = 0;
 	for (auto i = cur; i != poss.end(); ++i)
 	{
