@@ -2,93 +2,94 @@
 
 bool Game::solver()
 {
-	for (auto &k : game_board->k_list.c_list)
+	for (auto &block : game_board->sum_cells.the_list)
 	{
 		//	cout << "K: " << k->down <<"  "<<k->right<<endl;
-		if (k->d_list)
-			for (auto &o : k->d_list->o_list.c_list)
+		if (block->vertical_block)
+			for (auto &n_cell : block->vertical_block->numbersBlock.the_list)
 			{
-				//	cout << "o down: " << o->val << " x,y: " << o->x << " ," << o->y << endl;
-				if (!o->val)
+				//	cout << "n_cell down: " << n_cell->val << " x,y: " << n_cell->x << " ," << n_cell->y << endl;
+				if (!n_cell->val)
 					for (int n = 1; n < 10; n++)
-						if (possible(o->k_down, o->k_right, n))
+						if (possible(n_cell->v_sum_cell, n_cell->h_sum_cell, n))
 						{
-							o->val = n;
-							o->k_down->d_list->add_to_sum(n);
-							if (o->k_right)
-								o->k_right->r_list->add_to_sum(n);
-							//	cout <<endl<< "o down: " << o->val << " x,y: " << o->x << " ," << o->y << endl;
+							n_cell->val = n;
+							n_cell->v_sum_cell->vertical_block->add_to_sum(n);
+							if (n_cell->h_sum_cell)
+								n_cell->h_sum_cell->horizontal_block->add_to_sum(n);
+							//	cout <<endl<< "n_cell down: " << n_cell->val << " x,y: " << n_cell->x << " ," << n_cell->y << endl;
 							// cout << "try Val: "<< n<<endl;
-							// game_board->print();
+							// gameBoard->print();
 							if (solver())
 							{
-								o->val = 0;
-								o->k_down->d_list->add_to_sum(-n);
-								if (o->k_right)
-									o->k_right->r_list->add_to_sum(-n);
+								n_cell->val = 0;
+								n_cell->v_sum_cell->vertical_block->add_to_sum(-n);
+								if (n_cell->h_sum_cell)
+									n_cell->h_sum_cell->horizontal_block->add_to_sum(-n);
 							}
 							else
 								return false;
 						}
-				if (!o->val)
+				if (!n_cell->val)
 					return true;
 			}
-		if (k->down_sum() != k->down())
+		if (block->down_sum() != block->down())
 			return true;
-		if (k->r_list)
-			for (auto &o : k->r_list->o_list.c_list)
+
+		if (block->horizontal_block)
+			for (auto &n_cell : block->horizontal_block->numbersBlock.the_list)
 			{
-				//	cout << "o right: " << o->val <<" x,y: "<<o->x<<" ,"<<o->y<<endl;
-				if (!o->val)
+				//	cout << "n_cell right: " << n_cell->val <<" x,y: "<<n_cell->x<<" ,"<<n_cell->y<<endl;
+				if (!n_cell->val)
 					for (int n = 1; n < 10; n++)
-						if (possible(o->k_down, o->k_right, n))
+						if (possible(n_cell->v_sum_cell, n_cell->h_sum_cell, n))
 						{
-							o->val = n;
-							o->k_right->r_list->add_to_sum(n);
-							if (o->k_down)
-								o->k_down->d_list->add_to_sum(n);
-							//	cout << endl << "o right: " << o->val << " x,y: " << o->x << " ," << o->y << endl;
+							n_cell->val = n;
+							n_cell->h_sum_cell->horizontal_block->add_to_sum(n);
+							if (n_cell->v_sum_cell)
+								n_cell->v_sum_cell->vertical_block->add_to_sum(n);
+							//	cout << endl << "n_cell right: " << n_cell->val << " x,y: " << n_cell->x << " ," << n_cell->y << endl;
 							//		cout << "try Val: " << n<<endl;
-							// game_board->print();
+							// gameBoard->print();
 							if (solver())
 							{
-								o->val = 0;
-								o->k_right->r_list->add_to_sum(-n);
-								if (o->k_down)
-									o->k_down->d_list->add_to_sum(-n);
+								n_cell->val = 0;
+								n_cell->h_sum_cell->horizontal_block->add_to_sum(-n);
+								if (n_cell->v_sum_cell)
+									n_cell->v_sum_cell->vertical_block->add_to_sum(-n);
 							}
 							else
 								return false;
 						}
-				if (!o->val)
+				if (!n_cell->val)
 					return true;
 			}
-		if (k->right_sum() != k->right())
+		if (block->right_sum() != block->right())
 			return true;
 	}
-	// game_board->print();
+	// gameBoard->print();
 	// cout << "finished"<<endl;
 	return false;
 }
 
-bool Game::possible(const ptk_cell &k_down, const ptk_cell &k_right, int n)
+bool Game::possible(const sum_cell_ptr &v_sum_cell, const sum_cell_ptr &h_sum_cell, int n)
 {
 
-	if (n > k_down->d_list->max || n < k_down->d_list->min)
+	if (n > v_sum_cell->vertical_block->max || n < v_sum_cell->vertical_block->min)
 		return false;
-	if (n > k_right->r_list->max || n < k_right->r_list->min)
+	if (n > h_sum_cell->horizontal_block->max || n < h_sum_cell->horizontal_block->min)
 		return false;
-	if (n > k_down->d_list->remain())
+	if (n > v_sum_cell->vertical_block->remain())
 		return false;
-	if (n > k_right->r_list->remain())
+	if (n > h_sum_cell->horizontal_block->remain())
 		return false;
-	if (!std::all_of(k_down->d_list->o_list.c_list.cbegin(), k_down->d_list->o_list.c_list.cend(),
-									 [n](auto &o)
-									 { return o->val != n; }))
+	if (!std::all_of(v_sum_cell->vertical_block->numbersBlock.the_list.cbegin(), v_sum_cell->vertical_block->numbersBlock.the_list.cend(),
+									 [n](auto &n_cell)
+									 { return n_cell->val != n; }))
 		return false;
-	if (!std::all_of(k_right->r_list->o_list.c_list.cbegin(), k_right->r_list->o_list.c_list.cend(),
-									 [n](auto &o)
-									 { return o->val != n; }))
+	if (!std::all_of(h_sum_cell->horizontal_block->numbersBlock.the_list.cbegin(), h_sum_cell->horizontal_block->numbersBlock.the_list.cend(),
+									 [n](auto &n_cell)
+									 { return n_cell->val != n; }))
 		return false;
 	return true;
 }

@@ -20,9 +20,9 @@
 #define rcastcc reinterpret_cast<const char *>
 #define rcastc reinterpret_cast<char *>
 
-#define ptcell shared_ptr<cell>
-#define ptk_cell shared_ptr<k_cell>
-#define pto_cell shared_ptr<o_cell>
+#define cell_ptr shared_ptr<cell>
+#define sum_cell_ptr shared_ptr<sum_cell>
+#define number_cell_ptr shared_ptr<number_cell>
 
 using namespace std;
 /*Getting input int between range*/

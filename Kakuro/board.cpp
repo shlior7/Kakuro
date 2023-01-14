@@ -48,17 +48,17 @@ void board::push_current(int cur1, int cur2, int i, int j)
 		array.push_back(make_shared<cell>(i, j));
 		break;
 	case o_cell_type:
-		array.push_back(make_shared<o_cell>(i, j));
+		array.push_back(make_shared<number_cell>(i, j));
 		break;
 	case k_cell_type:
-		shared_ptr<k_cell> k = make_shared<k_cell>(i, j, cur1, cur2);
-		k_list.push_back(k);
+		shared_ptr<sum_cell> k = make_shared<sum_cell>(i, j, cur1, cur2);
+		sum_cells.push_back(k);
 		array.push_back(k);
 		break;
 	}
 }
 
-void board::get_board(std::vector<std::vector<int> > board)
+void board::get_board(std::vector<std::vector<int>> board)
 {
 	auto width = board[0].size();
 	auto height = board.size();
@@ -80,23 +80,23 @@ void board::get_board(std::vector<std::vector<int> > board)
 	connectLists();
 }
 
-vector<vector<int> > board::toVector()
+vector<vector<int>> board::toVector()
 {
-	vector<vector<int> > result;
+	vector<vector<int>> result;
 	for (int i = 0; i < height; i++)
 	{
 		vector<int> row;
 		for (int j = 0; j < width; j++)
 		{
-			if (typeid(*array[index(j, i)]) == typeid(k_cell))
+			if (typeid(*array[index(j, i)]) == typeid(sum_cell))
 			{
-				ptk_cell k = dynamic_pointer_cast<k_cell>(array[index(j, i)]);
+				sum_cell_ptr k = dynamic_pointer_cast<sum_cell>(array[index(j, i)]);
 				row.push_back(k->down());
 				row.push_back(k->right());
 			}
-			else if (typeid(*array[index(j, i)]) == typeid(o_cell))
+			else if (typeid(*array[index(j, i)]) == typeid(number_cell))
 			{
-				pto_cell o = dynamic_pointer_cast<o_cell>(array[index(j, i)]);
+				number_cell_ptr o = dynamic_pointer_cast<number_cell>(array[index(j, i)]);
 				row.push_back(o->val);
 				row.push_back(o->val);
 			}
@@ -111,39 +111,39 @@ vector<vector<int> > board::toVector()
 	return result;
 }
 
-void board::connectD(ptk_cell &kcell, int x, int y)
+void board::connectVerticals(sum_cell_ptr &sum_cell, int x, int y)
 {
 	int k = y + 1;
-	ptcell c = array[index(x, k)];
-	while (k < height && typeid(*array[index(x, k)]) == typeid(o_cell))
+	cell_ptr c = array[index(x, k)];
+	while (k < height && typeid(*array[index(x, k)]) == typeid(number_cell))
 	{
-		pto_cell o = dynamic_pointer_cast<o_cell>(array[index(x, k++)]);
-		o->k_down = kcell;
-		kcell->d_list->push_back(o);
+		number_cell_ptr o = dynamic_pointer_cast<number_cell>(array[index(x, k++)]);
+		o->v_sum_cell = sum_cell;
+		sum_cell->vertical_block->push_back(o);
 	}
-	kcell->d_list->setminmax();
+	sum_cell->vertical_block->setminmax();
 }
 
-void board::connectR(ptk_cell &kcell, int x, int y)
+void board::connectHorizontals(sum_cell_ptr &kcell, int x, int y)
 {
 	int k = x + 1;
-	while (k < width && typeid(*array[index(k, y)]) == typeid(o_cell))
+	while (k < width && typeid(*array[index(k, y)]) == typeid(number_cell))
 	{
-		pto_cell o = dynamic_pointer_cast<o_cell>(array[index(k++, y)]);
-		o->k_right = kcell;
-		kcell->r_list->push_back(o);
+		number_cell_ptr o = dynamic_pointer_cast<number_cell>(array[index(k++, y)]);
+		o->h_sum_cell = kcell;
+		kcell->horizontal_block->push_back(o);
 	}
-	kcell->r_list->setminmax();
+	kcell->horizontal_block->setminmax();
 }
 
 void board::connectLists()
 {
-	for (auto &it : k_list.c_list)
+	for (auto &it : sum_cells.the_list)
 	{
 		if (it->down())
-			connectD(it, it->x, it->y);
+			connectVerticals(it, it->x, it->y);
 		if (it->right())
-			connectR(it, it->x, it->y);
+			connectHorizontals(it, it->x, it->y);
 	}
 }
 void board::print()

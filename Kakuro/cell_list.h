@@ -4,22 +4,22 @@ template <class T>
 class cell_list
 {
 public:
-	list<shared_ptr<T> > c_list;
+	list<shared_ptr<T>> the_list;
 	int sum;
 	cell_list() : sum(0) {}
-	operator list<shared_ptr<T> > &()
+	operator list<shared_ptr<T>> &()
 	{
-		return c_list;
+		return the_list;
 	}
-	int size() const { return c_list.size(); }
+	int size() const { return the_list.size(); }
 	void push_back(shared_ptr<T> &ptr)
 	{
-		c_list.push_back(ptr);
+		the_list.push_back(ptr);
 	}
 
 	void print() const
 	{
-		for (auto &i : c_list)
+		for (auto &i : the_list)
 		{
 			cout << *i << endl;
 		}

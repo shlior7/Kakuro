@@ -148,10 +148,10 @@
     <ClInclude Include="board.h" />
     <ClInclude Include="cell.h" />
     <ClInclude Include="general.h" />
-    <ClInclude Include="kcell.h" />
-    <ClInclude Include="Ocell.h" />
+    <ClInclude Include="sum_cell.h" />
+    <ClInclude Include="number_cell.h" />
     <ClInclude Include="game.h" />
-    <ClInclude Include="sum_list.h" />
+    <ClInclude Include="cell_list.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

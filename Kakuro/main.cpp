@@ -120,7 +120,7 @@ int main()
 	Game kakuro(example);
 	// ifstream in;
 	// in.open("kakuro1.txt");
-	// kakuro.game_board->get_board(cin);
+	// kakuro.gameBoard->get_board(cin);
 	// in.close();
 	kakuro.game_board->toVector();
 	printf("wow");
