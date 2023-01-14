@@ -13,10 +13,14 @@ const fsReadFileHtml = (fileName) => {
     });
   });
 }
+let width = 0;
+let height = 0;
 
 fsReadFileHtml("kakuro1.html").then((htmlString) => {
   const $ = cheerio.load(htmlString);
   const kakuro_table_list = $("body > table > tbody > tr").map((index, element1) => {
+    if (!width) width = $(element1).children().length;
+    height++;
     return $(element1.children).map((index, element2) => {
       return [$(element2).attr('class'), $(element2).text()]
     });
@@ -26,43 +30,49 @@ fsReadFileHtml("kakuro1.html").then((htmlString) => {
   kakuro_table_list.each((index, element3) => {
     element3.each((index, element4) => {
       if (element4 !== undefined)
-        result.push(element4)
+        result.push(element4.trim())
 
     })
   })
   const res = []
-  result.map((element, index) => {
+  let row = [];
+  let cells_index = 0
+  result.forEach((element, index) => {
+    cells_index++;
     switch (element) {
       case 'cellShaded':
-        res.push(-1, -1);
+        row.push(-1, -1);
         break;
       case 'cellTotal':
-        const numbers = result[index + 1].split('\n').filter(n => {
-          let b = false;
-          for (var i = 0; i < n.length; i++) {
-            if (n.charAt(i) !== ' ') {
-              b = true;
-              break;
-            }
-          }
-          return b
-        })
+        const numbers = result[index + 1].split('\n').map(s => s.trim()).filter(s => s.length > 0)
         for (let i = 0; i < 2; i++) {
           if (numbers.length > 0) {
-            res.push(parseInt(numbers[numbers.length - 1]));
+            row.push(parseInt(numbers[numbers.length - 1]));
             numbers.pop();
           }
           else {
-            res.push(-1)
+            row.push(-1)
           }
         }
         break;
       case 'cellNumber':
-        res.push(0, 0);
+        row.push(0, 0);
+        break;
+
+      default:
+        cells_index--;
+        break;
+    }
+
+    if (cells_index && cells_index % width === 0 && row.length > 0) {
+      res.push(row)
+      row = []
     }
   })
+
+
   console.log(res)
-  console.log(res.length)
+  // console.log(res.length)
   // console.log(kakuro_table_list)
   // console.log(kakuro_table_list['0'])
 
