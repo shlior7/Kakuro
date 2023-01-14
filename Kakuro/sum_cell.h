@@ -22,7 +22,7 @@ public:
 		min = (2 * logical_sum + len * len - 21 * len + 20) / 2;
 		cout << min << "  " << max << endl;
 	}
-	void push_back(number_cell_ptr &c) { numbersBlock.push_back(c); }
+	void push_back(number_cell_ptr& c) { numbersBlock.push_back(c); }
 	void add_to_sum(int n) { physical_sum += n; }
 };
 
@@ -33,14 +33,14 @@ public:
 	// cell_list<o_cell> d_list, r_list;
 	sum_cell(int x, int y, int _vertical, int _horizontal) : cell(x, y)
 	{
-		if (_vertical)
+		if (_vertical > 0)
 			vertical_block = make_unique<block>(_vertical);
-		if (_horizontal)
+		if (_horizontal > 0)
 			horizontal_block = make_unique<block>(_horizontal);
 	}
 
 	virtual ~sum_cell() {}
-	virtual void print(ostream &o)
+	virtual void print(ostream& o)
 	{
 		o << "|" << setw(2) << (!vertical_block ? "  " : to_string(down())) << "\\" << setw(2) << (!horizontal_block ? "  " : to_string(right()));
 	}
