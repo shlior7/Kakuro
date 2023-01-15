@@ -13,82 +13,119 @@ const fsReadFileHtml = (fileName) => {
     });
   });
 }
-let width = 0;
-let height = 0;
 
-fsReadFileHtml("kakuro1.html").then((htmlString) => {
-  const $ = cheerio.load(htmlString);
-  const kakuro_table_list = $("body > table > tbody > tr").map((index, element1) => {
-    if (!width) width = $(element1).children().length;
-    height++;
-    return $(element1.children).map((index, element2) => {
-      return [$(element2).attr('class'), $(element2).text()]
-    });
-  });
 
-  const result = []
-  kakuro_table_list.each((index, element3) => {
-    element3.each((index, element4) => {
-      if (element4 !== undefined)
-        result.push(element4.trim())
-
-    })
-  })
+const parseKakuroFromHtml = (fileName) => {
+  let width = 0;
+  let height = 0;
   const res = []
   let row = [];
   let cells_index = 0
-  result.forEach((element, index) => {
-    cells_index++;
-    switch (element) {
-      case 'cellShaded':
-        row.push(-1, -1);
-        break;
-      case 'cellTotal':
-        const numbers = result[index + 1].split('\n').map(s => s.trim()).filter(s => s.length > 0)
-        for (let i = 0; i < 2; i++) {
-          if (numbers.length > 0) {
-            row.push(parseInt(numbers[numbers.length - 1]));
-            numbers.pop();
+  fsReadFileHtml(fileName).then((htmlString) => {
+    const $ = cheerio.load(htmlString);
+    const kakuro_table_list = $("body > table > tbody > tr").map((index, element1) => {
+      if (!width) width = $(element1).children().length;
+      height++;
+
+      return $(element1.children).map((_, element2) => {
+        let isUpside = false;
+        element2?.children?.forEach(e => {
+          if (e?.attribs?.class === 'bottomNumber') {
+            isUpside = true;
           }
-          else {
-            row.push(-1)
-          }
+        })
+        // if (isUpside) console.log(isUpside, $(element2).text())
+
+
+        const data = { class: $(element2).attr('class'), value: $(element2).text(), isUpside }
+        if (data.class === undefined)
+          return;
+
+        cells_index++;
+        switch (data.class) {
+          case 'cellShaded':
+            row.push(-1, -1);
+            break;
+          case 'cellTotal':
+            const numbers = data.value.split('\n').map(s => s.trim()).filter(s => s.length > 0)
+            if (numbers.length === 1) {
+              numbers.unshift(-1);
+              if (data.isUpside) numbers.reverse()
+            }
+            if (numbers.length > 2) {
+              throw new Error('Invalid data')
+            }
+
+            for (let i = 1; i >= 0; i--) {
+              row.push(parseInt(numbers[i]));
+            }
+            break;
+          case 'cellNumber':
+            row.push(0, 0);
+            break;
+
+          default:
+            cells_index--;
+            break;
         }
-        break;
-      case 'cellNumber':
-        row.push(0, 0);
-        break;
 
-      default:
-        cells_index--;
-        break;
-    }
+        if (cells_index && cells_index % width === 0 && row.length > 0) {
+          res.push(row)
+          row = []
+        }
+      });
+    });
 
-    if (cells_index && cells_index % width === 0 && row.length > 0) {
-      res.push(row)
-      row = []
-    }
+    // const result = []
+    // kakuro_table_list.each((index, element3) => {
+    //   element3.each((element4) => {
+    //     if (element4 !== undefined)
+    //       result.push(element4.trim())
+
+    //   })
+    // })
+    // const res = []
+    // let row = [];
+    // let cells_index = 0
+    // result.forEach((element, index) => {
+    //   cells_index++;
+    //   switch (element) {
+    //     case 'cellShaded':
+    //       row.push(-1, -1);
+    //       break;
+    //     case 'cellTotal':
+    //       const numbers = result[index + 1].split('\n').map(s => s.trim()).filter(s => s.length > 0)
+    //       for (let i = 0; i < 2; i++) {
+    //         if (numbers.length > 0) {
+    //           row.push(parseInt(numbers[numbers.length - 1]));
+    //           numbers.pop();
+    //         }
+    //         else {
+    //           row.push(-1)
+    //         }
+    //       }
+    //       break;
+    //     case 'cellNumber':
+    //       row.push(0, 0);
+    //       break;
+
+    //     default:
+    //       cells_index--;
+    //       break;
+    //   }
+
+    //   if (cells_index && cells_index % width === 0 && row.length > 0) {
+    //     res.push(row)
+    //     row = []
+    //   }
+    // })
+
+    fs.writeFileSync(path.join(__dirname, fileName.replace('html', 'json')), JSON.stringify(res))
+
+    return res
   })
 
+}
 
-  console.log(res)
-  // console.log(res.length)
-  // console.log(kakuro_table_list)
-  // console.log(kakuro_table_list['0'])
-
-  // console.log($('body'))
-  // console.log($('body').children().length)
-})
-
-// fs.readFile('./kakuro1.html', async function (err, html) {
-//   if (err) {
-//     throw err;
-//   }
-//   console.log(html)
-//   // http.createServer(function (request, response) {
-//   //   response.writeHeader(200, { "Content-Type": "text/html" });
-//   //   response.write(html);
-//   //   response.end();
-//   // }).listen(8000);
-// });
+parseKakuroFromHtml('kakuro2.html')
 

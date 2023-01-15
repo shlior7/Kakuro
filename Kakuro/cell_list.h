@@ -1,5 +1,6 @@
 #pragma once
 #include "cell.h"
+
 template <class T>
 class cell_list
 {
@@ -16,7 +17,6 @@ public:
 	{
 		the_list.push_back(ptr);
 	}
-
 	void print() const
 	{
 		for (auto &i : the_list)

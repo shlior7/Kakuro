@@ -5,7 +5,7 @@ enum type
 	o_cell_type = 0,
 	k_cell_type = 1
 };
-void board::get_board(istream& in)
+void board::get_board(istream &in)
 {
 	string cur1, cur2;
 	int c1, c2;
@@ -91,8 +91,8 @@ vector<vector<int>> board::toVector()
 			if (typeid(*array[index(j, i)]) == typeid(sum_cell))
 			{
 				sum_cell_ptr k = dynamic_pointer_cast<sum_cell>(array[index(j, i)]);
-				row.push_back(k->down());
-				row.push_back(k->right());
+				row.push_back(k->v_logical_sum());
+				row.push_back(k->h_logical_sum());
 			}
 			else if (typeid(*array[index(j, i)]) == typeid(number_cell))
 			{
@@ -111,10 +111,10 @@ vector<vector<int>> board::toVector()
 	return result;
 }
 
-void board::connectVerticals(sum_cell_ptr& sum_cell, int x, int y)
+void board::connectVerticals(sum_cell_ptr &sum_cell, int x, int y)
 {
 	int k = y + 1;
-	//cell_ptr c = array[index(x, k)];
+	// cell_ptr c = array[index(x, k)];
 	while (k < height && typeid(*array[index(x, k)]) == typeid(number_cell))
 	{
 		number_cell_ptr o = dynamic_pointer_cast<number_cell>(array[index(x, k++)]);
@@ -124,7 +124,7 @@ void board::connectVerticals(sum_cell_ptr& sum_cell, int x, int y)
 	sum_cell->vertical_block->setminmax();
 }
 
-void board::connectHorizontals(sum_cell_ptr& kcell, int x, int y)
+void board::connectHorizontals(sum_cell_ptr &kcell, int x, int y)
 {
 	int k = x + 1;
 	while (k < width && typeid(*array[index(k, y)]) == typeid(number_cell))
@@ -138,13 +138,14 @@ void board::connectHorizontals(sum_cell_ptr& kcell, int x, int y)
 
 void board::connectLists()
 {
-	for (auto& it : sum_cells.the_list)
+	for (auto &it : sum_cells.the_list)
 	{
-		if (it->down())
+		if (it->v_logical_sum())
 			connectVerticals(it, it->x, it->y);
-		if (it->right())
+		if (it->h_logical_sum())
 			connectHorizontals(it, it->x, it->y);
 	}
+	// sort_sum_cells();
 }
 void board::print()
 {
@@ -162,4 +163,12 @@ void board::print()
 		cout << "k: "<<endl;
 		i->printList();
 	}*/
+}
+
+void board::sort_sum_cells()
+{
+	sum_cells.the_list.sort([](sum_cell_ptr a, sum_cell_ptr b)
+													{ return a->v_logical_sum() + a->h_logical_sum() > b->v_logical_sum() + b->h_logical_sum(); });
+
+	// sum_cells.print();
 }

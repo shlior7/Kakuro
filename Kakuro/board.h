@@ -30,4 +30,5 @@ public:
 	void solve();
 	vector<vector<int>> toVector();
 	void print();
+	void sort_sum_cells();
 };
