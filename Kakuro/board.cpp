@@ -78,6 +78,7 @@ void board::get_board(std::vector<std::vector<int>> board)
 	}
 	print();
 	connectLists();
+	// sort_sum_cells();
 }
 
 vector<vector<int>> board::toVector()
@@ -168,7 +169,5 @@ void board::print()
 void board::sort_sum_cells()
 {
 	sum_cells.the_list.sort([](sum_cell_ptr a, sum_cell_ptr b)
-													{ return a->v_logical_sum() + a->h_logical_sum() > b->v_logical_sum() + b->h_logical_sum(); });
-
-	// sum_cells.print();
+													{ return a->v_logical_sum() + a->h_logical_sum() < b->v_logical_sum() + b->h_logical_sum(); });
 }

@@ -12,7 +12,7 @@ public:
 		// for (int i = 0; i < 10; i++)
 		//	options[i] = i;
 	}
-
+	int get_val() const { return val; }
 	operator int &()
 	{
 		return val;
@@ -34,5 +34,3 @@ public:
 		return os << ocell.x << "  " << ocell.y << "  " << ocell.val << endl;
 	}
 };
-
-#define number_cell_ptr shared_ptr<number_cell>

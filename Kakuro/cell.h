@@ -5,10 +5,13 @@ class cell
 {
 public:
 	int x, y;
-	cell(int _x = -1,int _y = -1):x(_x),y(_y){}
+	cell(int _x = -1, int _y = -1) : x(_x), y(_y) {}
 
-	virtual ~cell(){}
-	virtual void print(ostream& o){
+	virtual ~cell() {}
+	virtual void print(ostream &o)
+	{
 		o << "|XX\\XX";
 	}
 };
+
+#define cell_ptr shared_ptr<cell>
